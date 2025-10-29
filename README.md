@@ -1,137 +1,117 @@
-🧠 TechMind Access Portal
-Plataforma Inteligente de Monitoramento e Inventário Corporativo
+# 🧠 TechMind – Sistema Inteligente de Inventário e Gestão de Ativos de TI
 
-O TechMind Access Portal é uma solução completa de gestão e monitoramento de ativos computacionais, desenvolvida para ambientes corporativos que exigem controle, segurança e integração contínua com o diretório corporativo (LDAP).
+O **TechMind** é uma plataforma completa de **inventário e monitoramento de ativos de TI**, desenvolvida para oferecer **visibilidade em tempo real** sobre o parque computacional da organização.  
+Integrando **frontend em Angular** e **backend em Python/Django**, a ferramenta proporciona **gestão centralizada, acesso seguro e automação inteligente** de coleta e atualização de dados.
 
-Projetado com foco em eficiência, escalabilidade e automação, o sistema centraliza informações detalhadas sobre hardware, software, sessões de acesso e inventário físico, permitindo decisões rápidas e assertivas sobre o parque tecnológico da empresa.
+---
 
-💡 Propósito da Ferramenta
+## 💡 Propósito da Ferramenta
 
-Gerenciar e monitorar todos os dispositivos conectados ao ambiente corporativo de forma automatizada, segura e integrada, reduzindo o esforço manual e garantindo a consistência entre o inventário real e o registrado no Active Directory (AD).
+Em ambientes corporativos, manter um inventário atualizado de máquinas, softwares e configurações é essencial para **segurança, governança e eficiência operacional**.  
+O **TechMind** resolve esse desafio automatizando o processo de inventário e controle, oferecendo um **painel unificado** com informações detalhadas de hardware, software e sessões ativas.
 
-O sistema oferece uma visão completa da infraestrutura, consolidando dados técnicos e operacionais de cada máquina em tempo real.
+---
 
-🧭 Como Funciona
+## ⚙️ Como Funciona
 
-O funcionamento do TechMind Access Portal é dividido em três camadas principais, interligadas de forma eficiente:
+A solução é composta por três camadas integradas:
 
-🧩 Agente Local (GoLang)
+1. **Frontend (Angular)**  
+   Interface moderna e responsiva, oferecendo dashboards intuitivos e visualização rápida dos dados coletados.  
 
-Instalado em cada máquina cliente.
+2. **Backend (Python/Django)**  
+   Responsável pelo processamento, autenticação via **LDAP** e integração com o banco de dados **SQL**.  
+   Utiliza **Redis** para otimizar a comunicação entre serviços e melhorar o desempenho em operações simultâneas.  
 
-Coleta dados de hardware, software e rede.
+3. **Agente Local (Golang)**  
+   Um software executável instalado em cada máquina cliente.  
+   - Coleta dados de hardware e software  
+   - Gera logs e relatórios locais  
+   - Possui sistema de **autoatualização**  
+   - É altamente otimizado, funcionando bem até em computadores com recursos limitados  
+   - Roda automaticamente no login do usuário  
 
-Roda automaticamente no login do usuário.
+4. **Instalador (C#)**  
+   Desenvolvido para garantir **implantação simples e segura** nas máquinas clientes.
 
-Gera logs de execução e realiza autoatualização.
+---
 
-Extremamente otimizado, ideal para computadores de baixo desempenho.
+## 📊 Principais Funcionalidades
 
-Desenvolvido em GoLang, garantindo leveza e desempenho nativo.
+- 🔐 **Autenticação via LDAP** – Acesso restrito a usuários autorizados.  
+- 🖥️ **Dashboard de Equipamentos** – Exibe todos os dispositivos instalados e ativos locais.  
+- 📈 **Dashboard de Sessões** – Acompanha histórico de acessos, número de máquinas conectadas e horários.  
+- 💽 **Dashboard de Sistemas Operacionais** – Monitora distribuições, versões e compatibilidade com o AD.  
+- 🧩 **Painel Detalhado de Máquinas** –  
+  Informações completas de cada dispositivo, incluindo:
+  - **Hardware:** CPU, GPU, memória, HD, BIOS, motherboard, slots e capacidades.  
+  - **Software:** versões, licenças, sistema operacional, softwares instalados.  
+  - **Rede:** IP, domínio, MAC address.  
+  - **Inventário:** localização, imobilizado, status de locação, notas e observações.  
+- 🔁 **Atualização Automática** – O próprio sistema de inventário é atualizado via portal.  
+- ⚡ **Sincronização Otimizada com Redis** – Respostas rápidas e processamento dinâmico de solicitações.  
 
-⚙️ Backend (Python/Django + Redis)
+---
 
-Responsável pelo processamento, armazenamento e comunicação entre os módulos.
+## 🧠 Tecnologias e Recursos Utilizados
 
-Integração direta com LDAP para controle de autenticação e acesso.
+| Camada | Tecnologia | Descrição |
+|--------|-------------|-----------|
+| **Frontend** | Angular | Interface interativa e reativa com dashboards modernos |
+| **Backend** | Python / Django | Lógica de negócios, API REST e integração LDAP |
+| **Banco de Dados** | SQL | Armazenamento eficiente de informações de inventário |
+| **Cache / Mensageria** | Redis | Otimização da comunicação entre frontend e backend |
+| **Agente Local** | Golang | Coleta e atualização automática de dados das máquinas |
+| **Instalador** | C# | Distribuição e instalação do agente local |
+| **Integração** | LDAP | Controle de acesso seguro e corporativo |
 
-Utiliza Redis para agilizar respostas entre frontend e backend, melhorando a performance e a sincronização de dados.
+---
 
-Armazena informações em banco de dados SQL, com estrutura otimizada (dados em string, baixo consumo de espaço).
+## 🧩 Como Executar Localmente
 
-💻 Frontend (Angular)
+### 🔧 Backend (Django)
+```bash
+# Clone o repositório
 
-Interface moderna, responsiva e de fácil navegação.
-
-Dashboards interativos para visualização de equipamentos, sessões e sistemas operacionais.
-
-Comunicação em tempo real com o backend via APIs RESTful e cache Redis.
-
-📊 Principais Dashboards e Funcionalidades
-🔐 Acesso e Autenticação
-
-Integração completa com LDAP.
-
-Acesso exclusivo a usuários autorizados.
-
-🖥️ Dashboard de Equipamentos
-
-Visualização de todas as máquinas instaladas localmente.
-
-Exibição detalhada dos dados de cada dispositivo, incluindo:
-
-Rede: MAC Address, domínio, IP, fabricante e modelo.
-
-Sistema Operacional: nome, distribuição, versão e data de conexão.
-
-Usuário: nome do usuário logado e status de acesso.
-
-Hardware Completo:
-
-CPU: modelo, arquitetura, núcleos, threads, frequência mínima e máxima, vendor ID.
-
-GPU: vendor ID, bus info, clock, logical name, configuração.
-
-Memória: capacidade máxima, número de slots.
-
-Armazenamento: modelo, número de série, capacidade, versão SATA.
-
-Placa-mãe: fabricante, produto, versão, número de série, asset tag.
-
-BIOS: versão e data.
-
-Áudio: modelo e fabricante.
-
-Softwares Instalados: nome, versão e licenças.
-
-Inventário Físico: imobilizado, localização, notas e disponibilidade para locação.
-
-Sistema: versão do inventário, portas lógicas abertas e status de comunicação.
-
-📈 Dashboard de Sessões
-
-Histórico de acessos e contagem de conexões por máquina.
-
-🧠 Dashboard de Sistemas Operacionais
-
-Análise comparativa entre os sistemas registrados no portal e no Active Directory, garantindo a consistência dos dados.
-
-🔄 Atualização do Agente
-
-Atualização remota e automatizada do software de inventário, diretamente pelo portal.
-
-🧠 Tecnologias e Recursos Utilizados
-Camada	Tecnologia	Descrição
-Frontend	Angular	Framework moderno e reativo para aplicações SPA.
-Backend	Python / Django	Estrutura robusta e escalável para APIs e lógica de negócio.
-Banco de Dados	SQL (PostgreSQL/MySQL)	Armazenamento eficiente, com estrutura leve em strings.
-Cache e Mensageria	Redis	Acelera comunicações e respostas entre frontend e backend.
-Agente Local	GoLang	Aplicativo leve, otimizado e autoatualizável para coleta de dados.
-Instalador	C#	Instalador nativo para ambientes Windows.
-Autenticação	LDAP	Integração corporativa com controle de acesso seguro.
-
-
-🧩 Como Executar Localmente
-🔧 Frontend (Angular)
-ng build
-mover pasta static para pasta backend
+cd techmind/backend
 
 🐍 Backend (Django)
+# Crie o ambiente virtual
+python -m venv venv
+source venv/bin/activate  # ou venv\Scripts\activate no Windows
+
+# Instale as dependências
 pip install -r requirements.txt
-python manage.py migrate
-python -m daphne -b 0.0.0.0 -p 3000 techmind.asgi:application
+
+💻 Frontend (Angular)
+ng build
+cole a pasta static em techmind/backend
 
 💾 Redis
 redis-server
 
-💻 Agente Local
+🐍 Backend (Django)
+Execute:
+python -m daphne -b 0.0.0.0 -p 3000 techmind.asgi:application
 
-O executável (em GoLang) deve ser instalado nas máquinas clientes.
-Ele iniciará automaticamente no login do usuário e enviará os dados ao servidor configurado.
+
+Acesse no navegador: http://localhost:3000
+
+🧩 Arquitetura Resumida
+┌────────────────────┐       ┌────────────────────┐
+│  Agente Local      │──────▶│  Backend Django     │
+│ (Golang)           │       │  + Redis + SQL      │
+└────────────────────┘       └─────────┬───────────┘
+                                        │
+                                        ▼
+                               ┌────────────────────┐
+                               │  Frontend Angular  │
+                               │  Dashboards e UI   │
+                               └────────────────────┘
 
 🌟 Conclusão
 
-O TechMind Access Portal foi desenvolvido com foco em eficiência, escalabilidade e segurança corporativa, utilizando boas práticas modernas de desenvolvimento full stack.
-A combinação de Angular, Django, GoLang e Redis garante desempenho excepcional, mesmo em ambientes de grande volume de dados e dispositivos conectados.
+O TechMind foi desenvolvido com foco em eficiência, escalabilidade e governança de ativos de TI, combinando desempenho técnico e experiência visual moderna.
+A plataforma representa um exemplo sólido de integração entre múltiplas linguagens e frameworks, evidenciando boas práticas de arquitetura e desenvolvimento corporativo.
 
-🚀 Projeto desenvolvido para proporcionar visibilidade total da infraestrutura corporativa, aliando tecnologia, automação e inteligência operacional.
+🚀 Projeto desenvolvido com foco em eficiência, escalabilidade e boas práticas modernas de desenvolvimento.
