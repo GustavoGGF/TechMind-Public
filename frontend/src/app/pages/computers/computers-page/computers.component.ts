@@ -5,20 +5,15 @@ import {
   Renderer2,
   ViewChild,
 } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { catchError, throwError } from "rxjs";
-import { saveAs } from "file-saver";
+
 import { FilterService } from "../filter.service";
 
 interface Software {
   name: string;
   ids: string[];
   // Adicione outras propriedades se necessário
-}
-
-export interface ReportResponse {
-  file_name: string;
-  file_content: string;
 }
 
 @Component({
@@ -46,23 +41,16 @@ export class ComputersComponent implements OnInit {
   computers_class: string = "active";
   errorType: string = "";
   input_name: string = "";
-  input_pwd: string = "";
-  input_username: string = "";
-  inputUsername: string = "";
-  inputPass: string = "";
+
   messageError: string = "";
   placeHolderDynamic: string = "Selecione um Software";
-  closeBTN: string = "/static/assets/images/fechar.png";
 
   quantity_filter: string = "";
-  selectedReports: string = "None";
   field_for_filter: string = "";
   ten_quantity: string = "";
 
   // Declarando variaveis boolean
   canView: boolean = false;
-  canViewCredentials: boolean = false;
-  canViewCredentialsLoading: boolean = false;
   canViewMachines: boolean = false;
   canViewMessage: boolean = false;
   checkedAll: boolean = true;
@@ -451,192 +439,6 @@ export class ComputersComponent implements OnInit {
     } catch (err) {
       return console.error(err);
     }
-  }
-
-  // Pega o usuario inserido
-  getUserName(event: any): void {
-    this.input_username = event.target.value;
-  }
-
-  // Pega a senha inserida
-  getPwd(event: any): void {
-    this.input_pwd = event.target.value;
-  }
-
-  onReportChange(value: string): void {
-    if (value === "DNS") {
-      this.reportDNS();
-    } else if (value === "reportxls") {
-      this.exportMachineReport();
-    }
-  }
-
-  // Habilita a tela de credencial e ativa um eventListener
-  reportDNS(): void {
-    this.canViewCredentials = true;
-    this.enableAddEventListener(this.keydownHandlerReport);
-  }
-
-  // Este método privado atua como handler para o evento de teclado.
-  // Quando a tecla "Escape" é pressionada e a visualização de credenciais está ativa,
-  // ele desativa a visualização e remove o eventListener associado.
-  // Handler privado para eventos de tecla pressionada
-  private keydownHandlerReport = (event: KeyboardEvent) => {
-    // Verifica se a tecla pressionada é "Escape" e se as credenciais estão visíveis
-    if (event.key === "Escape" && this.canViewCredentials) {
-      // Oculta as credenciais
-      this.canViewCredentials = false;
-
-      // Remove o eventListener de teclado
-      this.disableEventListener(this.keydownHandlerReport);
-    } else if (event.key === "Enter" && this.canViewCredentials) {
-      this.submitReportDNS();
-      this.disableEventListener(this.keydownHandlerReport);
-    }
-  };
-
-  // Esta função habilita o eventListener para capturar eventos de teclado,
-  // associando o handler `keydownHandler` para tratar as teclas pressionadas.
-  enableAddEventListener(handler: (event: KeyboardEvent) => void): void {
-    // Adiciona o listener para o evento "keydown", chamando o handler definido
-    document.addEventListener("keydown", handler);
-  }
-
-  // Esta função desativa o eventListener de teclado e redefine a seleção de relatórios,
-  // garantindo que nenhum relatório permaneça selecionado após a remoção do listener.
-  disableEventListener(handler: (event: KeyboardEvent) => void): void {
-    // Reseta a seleção de relatórios para "None"
-    this.selectedReports = "None";
-
-    // Remove o listener do evento "keydown"
-    document.removeEventListener("keydown", handler);
-  }
-
-  closeCredential(): void {
-    this.canViewCredentials = false;
-    this.selectedReports = "None";
-    this.inputUsername = "";
-    this.inputPass = "";
-    this.canViewCredentialsLoading = false;
-  }
-
-  exportMachineReport(): void {
-    // Seleciona todos os checkboxes com a classe 'ckip'
-    const checkboxes = this.el.nativeElement.querySelectorAll(".ckip");
-
-    // Array para armazenar os valores dos checkboxes marcados
-    const selectedValues: string[] = [];
-
-    // Itera sobre os checkboxes
-    checkboxes.forEach((checkbox: HTMLInputElement) => {
-      if (checkbox.checked) {
-        // Se o checkbox está marcado, adiciona seu valor ao array
-        selectedValues.push(checkbox.value);
-      }
-    });
-
-    if (selectedValues.length == 0) {
-      const selectT = document.getElementById(
-        "selectElement"
-      ) as HTMLSelectElement;
-      selectT.value = "None";
-      this.errorType = "Falta de Dados";
-      this.messageError = "Necessário selecionar ao menos um computador";
-      this.canViewMessage = true;
-      return;
-    }
-
-    // Converte o array em uma string separada por vírgulas
-    const selectedValuesString = selectedValues.join(",");
-
-    this.http
-      .post<ReportResponse>(
-        "/home/computers/get-report/xls/",
-        {
-          selectedValues: selectedValuesString,
-        },
-        {
-          headers: new HttpHeaders({
-            "Content-Type": "application/json",
-          }),
-        }
-      )
-      .pipe(
-        catchError((error) => {
-          this.status = error.status;
-
-          return throwError(error);
-        })
-      )
-      .subscribe((response) => {
-        const fileName = response.file_name || "report.xlsx";
-        const fileContent = response.file_content;
-
-        // Converte a string base64 em um Blob
-        const byteCharacters = atob(fileContent);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-
-        // Usa a biblioteca file-saver para salvar o arquivo
-        saveAs(blob, fileName);
-      }),
-      (error: any) => {
-        console.error("Download error:", error);
-      };
-  }
-
-  // Envia o usuario e senha para o backend
-  submitReportDNS(): void {
-    this.canViewCredentialsLoading = true;
-    this.http
-      .post(
-        "/home/computers/report-dns",
-        {
-          username: this.input_username,
-          pwd: this.input_pwd,
-        },
-        {
-          headers: new HttpHeaders({
-            "X-CSRFToken": this.token,
-            "Content-Type": "application/json",
-          }),
-        }
-      )
-      .pipe(
-        catchError((error) => {
-          this.status = error.status;
-
-          if (this.status !== 200) {
-            this.canViewCredentialsLoading = false;
-          }
-          if (this.status === 401) {
-            this.errorType = "Invalid Credentials";
-            this.messageError = "Usuario e/ou Senha Incorreto";
-            this.canViewMessage = true;
-          }
-          return throwError(error);
-        })
-      )
-      .subscribe((data: any) => {
-        if (data) {
-          const link = document.createElement("a");
-          link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${data.filedata}`;
-          link.download = data.filename;
-          link.click();
-          this.canViewCredentials = false;
-          this.canViewCredentialsLoading = false;
-          this.selectedReports = "None";
-          this.input_username = "";
-          this.input_pwd = "";
-        }
-      });
   }
 
   selectAll(): void {

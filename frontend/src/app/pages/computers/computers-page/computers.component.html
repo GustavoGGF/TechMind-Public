@@ -1,7 +1,4 @@
 <div class="main">
-  <div class="loadingTotality" *ngIf="canViewCredentialsLoading">
-    <app-loading-perfect-ape />
-  </div>
   <app-navbar
     *ngIf="canView"
     [name]="name"
@@ -19,25 +16,10 @@
       (filterChanged)="onQuantityChanged($event)"
     ></app-quantity-buttons>
     <app-filter-buton></app-filter-buton>
-    <div class="filter_back">
-      <div>
-        <select
-          class="form-select"
-          name="dis"
-          [(ngModel)]="selectedReports"
-          (ngModelChange)="onReportChange($event)"
-          id="selectElement"
-        >
-          <option value="None" disabled>Relatórios</option>
-          <option value="DNS">Relatório DNS</option>
-          <option value="reportxls" id="reportMachine">
-            Relatório Máquina
-          </option>
-        </select>
-      </div>
-    </div>
+    <app-filter-window></app-filter-window>
+    <app-system-report></app-system-report>
   </div>
-  <app-filter-window></app-filter-window>
+
   <table class="tb">
     <thead class="th-bl">
       <tr>
@@ -164,41 +146,4 @@
       </tr>
     </tbody>
   </table>
-  <div
-    *ngIf="canViewCredentials"
-    class="dashReport position-fixed top-50 start-50 translate-middle"
-  >
-    <button
-      id="closeReport"
-      (click)="closeCredential()"
-      class="position-absolute top-0 end-0 btn"
-    >
-      <img [src]="closeBTN" class="img-fluid img_close" alt="Botão de Fechar" />
-    </button>
-    <div class="form-floating mb-3">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Username"
-        (input)="getUserName($event)"
-        [(ngModel)]="inputUsername"
-      />
-      <label for="floatingModel">Username</label>
-    </div>
-    <div class="form-floating mb-3">
-      <input
-        type="password"
-        class="form-control"
-        placeholder="Password"
-        (input)="getPwd($event)"
-        [(ngModel)]="inputPass"
-      />
-      <label for="floatingModel">Password</label>
-    </div>
-    <div>
-      <button class="btn btn-success" (click)="submitReportDNS()">
-        Gerar Relatório
-      </button>
-    </div>
-  </div>
 </div>

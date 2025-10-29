@@ -1,0 +1,13 @@
+<div>
+  <select
+    class="form-select"
+    name="dis"
+    [(ngModel)]="selectedReports"
+    (ngModelChange)="onReportChange($event)"
+    id="selectElement"
+  >
+    <option value="None" disabled>Relatórios</option>
+    <option value="DNS">Relatório DNS</option>
+    <option value="reportxls" id="reportMachine">Relatório Máquina</option>
+  </select>
+</div>

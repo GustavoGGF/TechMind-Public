@@ -1076,214 +1076,206 @@ def get_quantity(request, quantity):
             cursor.close()
             connection.close()
 
-# Função que gera relatorio DNS mostrando ip Identicos
-@require_POST
+
+"""
+Descrição: Gera um relatório em Excel contendo todas as máquinas do Active Directory que compartilham o mesmo endereço IP, permitindo identificar duplicidade de IPs na rede.
+
+Quando usada: Acionada quando o usuário solicita o relatório de DNS na interface, para verificar conflitos de IP entre computadores cadastrados no AD.
+
+Por que é usada: Para detectar rapidamente máquinas com o mesmo IP, evitando problemas de conectividade e conflitos de rede, garantindo integridade e monitoramento da infraestrutura.
+
+Parâmetros:
+- request: HttpRequest, objeto que contém os dados da requisição HTTP GET, usado para autenticação e controle de cache.
+
+Variáveis:
+- server: Server, objeto que representa o servidor LDAP configurado.
+- conn: Connection, conexão autenticada com o servidor LDAP para leitura dos dados.
+- ip_to_hostnames: dict, mapeia cada endereço IP para uma lista de hostnames que o utilizam.
+- entry: cada objeto retornado da pesquisa no LDAP, representando um computador.
+- hostname: str, o valor do atributo dnsHostName de cada computador.
+- data: list[dict], lista de dicionários contendo IPs com mais de um hostname associado, pronta para exportação.
+- buffer: BytesIO, buffer em memória para gerar o arquivo Excel.
+"""
+@cache_page(60 * 3)
+@login_required
+@require_GET
 @never_cache
 def get_report_dns(request):
-    if request.method == "POST":
-        try:
-            data = loads(request.body)
-            username = data.get("username")
-            pwd = data.get("pwd")
+    try:
+        # Cria objeto de servidor LDAP usando configuração
+        server = Server(config("SERVER1"), get_info=ALL)
 
-            # Conectar ao servidor LDAP
-            server = Server(config("SERVER1"), get_info=ALL)
-            conn = Connection(
-                server,
-                user=f"nt-lupatech\\{username}",
-                password=pwd,
-                auto_bind=True,
-                read_only=True,
-            )
+        # Estabelece conexão LDAP com usuário e senha, modo somente leitura
+        conn = Connection(
+            server,
+            user=f"nt-lupatech\\{config('ACCOUNT_MCH_SR')}",
+            password=config("ACCOUNT_MCH_WD"),
+            auto_bind=True,
+            read_only=True
+        )
 
-            # Realizar a pesquisa
-            conn.search(
-                search_base=config("LDAP_BASE"),
-                search_filter="(objectClass=computer)",
-                attributes=["dnsHostName"],
-                search_scope=SUBTREE,
-                types_only=False,
-            )
+        # Realiza busca no LDAP para obter todos os computadores com atributo dnsHostName
+        conn.search(
+            search_base=config("LDAP_BASE"),
+            search_filter="(objectClass=computer)",
+            attributes=["dnsHostName"],
+            search_scope=SUBTREE
+        )
 
-            # Processar e imprimir os resultados
-            ip_to_hostnames = {}
-            for entry in conn.entries:
-                if "dnsHostName" in entry:
-                    hostname = entry.dnsHostName.value
-                    if hostname:
-                        ips = get_ip_from_dns(hostname)
-                        if ips is not None:
-                            for ip in ips:
-                                if ip not in ip_to_hostnames:
-                                    ip_to_hostnames[ip] = []
-                                ip_to_hostnames[ip].append(hostname)
-                        else:
-                            logger.error(
-                                f"get_ip_from_dns returned None for hostname: {hostname}"
-                            )
+        # Dicionário para mapear IPs aos hostnames correspondentes
+        ip_to_hostnames = {}
 
-            # Filtrar IPs com múltiplos hostnames e preparar os dados para o DataFrame
-            dataPD = []
-            for ip, hostnames in ip_to_hostnames.items():
-                if len(hostnames) > 1:
-                    dataPD.append({"ip": ip, "hostnames": ", ".join(hostnames)})
+        # Itera sobre todas as entradas retornadas da pesquisa
+        for entry in conn.entries:
+            # Obtém o hostname do atributo dnsHostName, se existir
+            hostname = getattr(entry, 'dnsHostName', None)
+            if hostname:
+                # Resolve hostname para um ou mais IPs usando função auxiliar
+                for ip in get_ip_from_dns(hostname.value):
+                    # Adiciona o hostname à lista de hostnames do respectivo IP
+                    ip_to_hostnames.setdefault(ip, []).append(hostname.value)
 
-            # Criar DataFrame
-            df = DataFrame(dataPD)
+        # Filtra apenas os IPs que possuem mais de um hostname associado
+        data = [{"ip": ip, "hostnames": ", ".join(hosts)} for ip, hosts in ip_to_hostnames.items() if len(hosts) > 1]
 
-            # Salvar DataFrame em um buffer de memória
-            buffer = BytesIO()
-            with ExcelWriter(buffer, engine="openpyxl") as writer:
-                df.to_excel(writer, index=False)
+        # Cria buffer em memória para gerar arquivo Excel
+        buffer = BytesIO()
+        with ExcelWriter(buffer, engine="openpyxl") as writer:
+            # Converte os dados filtrados em DataFrame e escreve no Excel
+            DataFrame(data).to_excel(writer, index=False)
 
-            # Obter o conteúdo do buffer e codificá-lo em base64
-            buffer.seek(0)
-            excel_base64 = b64encode(buffer.read()).decode("utf-8")
+        # Posiciona cursor no início do buffer para leitura
+        buffer.seek(0)
 
-            # Criar a resposta JSON
-            response_data = {
-                "filename": "duplicated_ips.xlsx",
-                "filedata": excel_base64,
-            }
+        # Retorna o arquivo Excel codificado em base64 para o frontend
+        return JsonResponse({"filename": "duplicated_ips.xlsx", "filedata": b64encode(buffer.read()).decode()}, status=200)
 
-            return JsonResponse(response_data, status=200)
+    except Exception as e:
+        # Loga qualquer erro ocorrido e retorna resposta de falha
+        logger.error(f"An error occurred: {e}")
+        return JsonResponse({}, status=420)
 
-        except Exception as e:
-            logger.error(f"An error occurred: {e}")
-            return JsonResponse({}, status=420)
+"""
+Descrição: Converte o nome de uma máquina (hostname) em seu(s) endereço(s) IP correspondente(s) usando consulta DNS.
 
+Quando usada: Chamado dentro da função de geração de relatório DNS para obter os IPs das máquinas listadas no relatório.
 
-# Função que gera os ip's do DNS
+Por que é usada: Para permitir que o relatório DNS contenha informações completas de rede, associando cada hostname ao seu(s) IP(s).
+
+Parâmetros:
+- hostname: str, o nome da máquina cujo endereço IP deve ser obtido.
+
+Variáveis:
+- r: resultado de cada registro DNS do tipo "A" retornado pela função resolve, contendo o endereço IP.
+"""
 def get_ip_from_dns(hostname):
     try:
-        # Consulta DNS para registros A (IPv4)
-        answers = resolve(hostname, "A")
-        ips = [rdata.address for rdata in answers]
-        return ips
-    except Exception as e:
-        pass
+        # Resolve o hostname para registros DNS do tipo "A" e retorna todos os endereços IP encontrados
+        return [r.address for r in resolve(hostname, "A")]
+    except:
+        # Retorna lista vazia caso a resolução falhe (hostname não encontrado ou erro de rede)
+        return []
 
 
+
+"""
+Descrição: Gera um relatório em Excel contendo os dados das máquinas selecionadas pelo usuário, permitindo que o frontend faça o download do arquivo.
+
+Quando usada: Utilizada quando um usuário seleciona uma ou mais máquinas na interface e solicita um relatório detalhado em formato Excel.
+
+Por que é usada: Para fornecer uma forma padronizada de exportar informações das máquinas, como hardware, sistema operacional e softwares instalados, de forma rápida e automatizada, sem necessidade de manipulação manual dos dados.
+
+Parâmetros:
+- request: HttpRequest, objeto que contém os dados da requisição HTTP POST, incluindo o corpo com os valores das máquinas selecionadas.
+
+Variáveis:
+- data: dict, dados extraídos do corpo da requisição.
+- selected_values: str, string com os valores (MAC addresses) das máquinas selecionadas.
+- selected_list: list[str], lista de MAC addresses normalizados.
+- results: list, armazena os registros retornados do banco de dados para cada máquina selecionada.
+- softwares_list: list, lista de softwares instalados em cada máquina, extraídos do banco.
+- software_names_str: str, string contendo os nomes dos softwares instalados, separados por vírgula.
+- df: DataFrame, estrutura de dados do pandas contendo os dados organizados para exportação.
+- buffer: BytesIO, buffer em memória para gerar o arquivo Excel.
+- encoded_file: str, conteúdo do arquivo Excel codificado em base64 para envio via JSON.
+"""
 @require_POST
 @csrf_exempt
 def get_report_xls(request):
-    selected_values = None
-    selected_values_list = None
     try:
+        # Carrega os dados do corpo da requisição
         data = loads(request.body)
+
+        # Obtém os valores das máquinas selecionadas
         selected_values = data.get("selectedValues")
-        if selected_values:
-            # Converte a string de volta para uma lista
-            selected_values_list = selected_values.split(",")
-        # Fazendo o processamento necessário com selected_values_list
-        # Itera sobre os valores em selected_values_list
+
+        # Retorna falha caso nenhum valor seja fornecido
+        if not selected_values:
+            return JsonResponse({"status": "fail"}, status=312, safe=True)
+
+        # Normaliza os MAC addresses das máquinas selecionadas
+        selected_list = [normalize_mac_address(v) for v in selected_values.split(",")]
+
+        # Lista para armazenar resultados do banco de dados
         results = []
-        for value in selected_values_list:
-            value = normalize_mac_address(value)
-            cursor = None
-            query = None
-            result = None
-            try:
-                with get_database_connection() as connection:
-                    cursor = connection.cursor()
 
-                    # Monta a query substituindo o placeholder pelo valor
-                    query = "SELECT * FROM machines WHERE mac_address = %s;"
-                    cursor.execute(query, (value,))
-                    result = cursor.fetchone()
+        # Conecta ao banco de dados
+        with get_database_connection() as conn:
+            cursor = conn.cursor()
+            # Itera sobre cada MAC address e busca informações correspondentes
+            for mac in selected_list:
+                cursor.execute("SELECT * FROM machines WHERE mac_address = %s;", (mac,))
+                row = cursor.fetchone()
+                # Adiciona a linha retornada à lista de resultados, se existir
+                if row:
+                    results.append(row)
+            cursor.close()
 
-                    # Adiciona o resultado ao array de resultados
-                    results.append(result)
-            except connector.Error as e:
-                logger.error(f"Database query error for system {value}: {e}")
-                return JsonResponse({"status": "fail"}, safe=True, status=312)
+        # Retorna falha caso nenhuma máquina seja encontrada no banco
+        if not results:
+            return JsonResponse({"status": "fail"}, status=312, safe=True)
 
-            finally:
-                if connection.is_connected():
-                    cursor.close()
-                    connection.close()
-    except Exception as e:
-        logger.error(e)
-        return JsonResponse({"status": "fail"}, safe=True, status=312)
+        # Extrai a lista de softwares instalados da primeira máquina (assume mesma estrutura)
+        softwares_list = [literal_eval(r[40]) for r in results]
+        # Cria uma string com os nomes dos softwares instalados, separados por vírgula
+        software_names_str = ", ".join(
+            [s["name"] for s in softwares_list[0] if s.get("name")]
+        )
 
-    hostnames = None
-    so = None
-    dis = None
-    version = None
-    manufacturer = None
-    model = None
-    sn = None
-    hd_capacity = None
-    cpu_model = None
-    cpu_manufacturer = None
-    gpu_model = None
-    softwares_list = None
-    software_data = None
-    software_names = None
-    software_names_str = None
-    df = None
-    buffer = None
-    encoded_file = None
-    response_data = None
-    try:
-        # Extraindo apenas a primeira coluna (MAC Address)
-        hostnames = [row[1] for row in results]
-        so = [row[2] for row in results]
-        dis = [row[3] for row in results]
-        version = [row[6] for row in results]
-        manufacturer = [row[9] for row in results]
-        model = [row[10] for row in results]
-        sn = [row[11] for row in results]
-        hd_capacity = [row[16] for row in results]
-        cpu_model = [row[22] for row in results]
-        cpu_manufacturer = [row[21] for row in results]
-        gpu_model = [row[32] for row in results]
-        softwares_list = [row[40] for row in results]
-        software_data = literal_eval(softwares_list[0])
-        # Extraindo apenas os nomes dos programas
-        software_names = [
-            software["name"] for software in software_data if software["name"]
-        ]
-        # Juntando os nomes separados por vírgula
-        software_names_str = ", ".join(software_names)
-
-        buffer = BytesIO()
-
-        # Criar DataFrame com a coluna desejada
+        # Monta um DataFrame com os dados das máquinas para exportação
         df = DataFrame(
             {
-                "HostName": hostnames,
-                "SO": so,
-                "Distribuição": dis,
-                "Versão SO": version,
-                "Marca": manufacturer,
-                "Modelo": model,
-                "SN": sn,
-                "HD Capacidade": hd_capacity,
-                "CPU Modelo": cpu_model,
-                "CPU Fabricante": cpu_manufacturer,
-                "GPU Modelo": gpu_model,
+                "HostName": [r[1] for r in results],
+                "SO": [r[2] for r in results],
+                "Distribuição": [r[3] for r in results],
+                "Versão SO": [r[6] for r in results],
+                "Marca": [r[9] for r in results],
+                "Modelo": [r[10] for r in results],
+                "SN": [r[11] for r in results],
+                "HD Capacidade": [r[16] for r in results],
+                "CPU Modelo": [r[22] for r in results],
+                "CPU Fabricante": [r[21] for r in results],
+                "GPU Modelo": [r[32] for r in results],
                 "Programas Instalados": software_names_str,
             }
         )
 
+        # Cria um buffer em memória para armazenar o arquivo Excel
+        buffer = BytesIO()
+        # Exporta o DataFrame para Excel dentro do buffer
         df.to_excel(buffer, index=False, sheet_name="Report")
-
         buffer.seek(0)
 
-        # Codificar o buffer em base64
+        # Codifica o arquivo Excel em base64 para envio via JSON
         encoded_file = b64encode(buffer.read()).decode("utf-8")
 
-        # Criar a resposta JSON com o arquivo codificado
-        response_data = {
-            "file_name": "report.xlsx",
-            "file_content": encoded_file,
-        }
+        # Retorna o arquivo codificado para o frontend
+        return JsonResponse({"file_name": "report.xlsx", "file_content": encoded_file}, status=200, safe=True)
 
-        return JsonResponse(response_data, status=200, safe=True)
     except Exception as e:
+        # Loga qualquer erro ocorrido e retorna falha
         logger.error(e)
-        return JsonResponse({"status": "fail"}, safe=True, status=312)
+        return JsonResponse({"status": "fail"}, status=312, safe=True)
 
 
 def process_results(results):

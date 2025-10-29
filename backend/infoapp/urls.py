@@ -77,7 +77,7 @@ urlpatterns = [
         name="central-get-quantity",
     ),
     # URL que gera relatorio de DNS que visa mostrar ip identicos
-    path("computers/report-dns", views.get_report_dns, name="central-get-report-dns"),
+    path("computers/report/dns", views.get_report_dns, name="central-get-report-dns"),
     # URL para gerar um relatorio com as maquinas em XLS
     path(
         "computers/get-report/xls/", views.get_report_xls, name="central-get-report-xls"

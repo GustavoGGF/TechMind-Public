@@ -1,0 +1,9 @@
+.dashReport {
+  background-color: #ffffff;
+  padding: 2em;
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  z-index: 1;
+}

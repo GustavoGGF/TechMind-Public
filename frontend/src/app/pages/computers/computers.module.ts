@@ -11,6 +11,7 @@ import { ComputersDetailsComponent } from "./computers-details-page/computers-de
 import { QuantityButtonsComponent } from "./components/quantity-buttons/quantity-buttons.component";
 import { FilterButonComponent } from "./components/filter-buton/filter-buton.component";
 import { FilterWindowComponent } from "./components/filter-window/filter-window.component";
+import { SystemReportComponent } from "./components/system-report/system-report.component";
 
 @NgModule({
   declarations: [ComputersComponent, ComputersDetailsComponent],
@@ -25,6 +26,7 @@ import { FilterWindowComponent } from "./components/filter-window/filter-window.
     QuantityButtonsComponent,
     FilterButonComponent,
     FilterWindowComponent,
+    SystemReportComponent,
   ],
 })
 export class ComputersModule {}
