@@ -72,7 +72,6 @@ A solução é composta por três camadas integradas:
 
 ## 🧩 Como Executar Localmente
 
-### 🔧 Backend (Django)
 ```bash
 # Clone o repositório
 
@@ -111,7 +110,7 @@ Acesse no navegador: http://localhost:3000
                                │  Frontend Angular  │
                                │  Dashboards e UI   │
                                └────────────────────┘
-
+```
 🌟 Conclusão
 
 O TechMind foi desenvolvido com foco em eficiência, escalabilidade e governança de ativos de TI, combinando desempenho técnico e experiência visual moderna.
