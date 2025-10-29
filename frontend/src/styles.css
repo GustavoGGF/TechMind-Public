@@ -1,0 +1,75 @@
+body,
+html {
+  background-color: #f9fafb;
+}
+
+:root {
+  --red: #ef233c;
+  --blueLight: #00b4d8;
+  --black: #14213d;
+  --white: #fefae0;
+  --gray: #91979d;
+  --isabelline: #f2e9e4;
+  --Piction-Blue: #00a6fb;
+  --pure-white: #ffffff;
+  --lime: #00ff00;
+  --pastel-blue: #8de0fe;
+  --deep-magenta: #bb1266;
+}
+
+.bg-blueL {
+  background-color: var(--blueLight) !important;
+}
+
+.bg-white {
+  background-color: var(--pure-white);
+}
+
+.ng-dropdown-panel {
+  background-color: white !important;
+  padding: 0.3em;
+  left: 0;
+}
+
+.ng-select {
+  background-color: white !important;
+  border-radius: 0.8em;
+  padding: 1em;
+}
+
+.mg-2 {
+  margin: 2em;
+}
+
+.brd-rg-1 {
+  border-radius: 1em;
+}
+
+.u-none {
+  user-select: none;
+}
+
+.w_5 {
+  width: 5em !important;
+}
+
+.wd_form {
+  width: 12em !important;
+}
+
+.w_2dot5 {
+  width: 2.5em !important;
+}
+
+.p0 {
+  padding: 0 !important;
+}
+
+.active-loader {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.m0 {
+  margin: 0;
+}
