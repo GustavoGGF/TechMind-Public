@@ -11,7 +11,7 @@
     (click)="closeMessage()"
   />
   <app-loading *ngIf="!canView" />
-  <div class="w-100 d-flex justify-content-around">
+  <div class="w-100 d-flex justify-content-around align-items-cente pd-1">
     <app-quantity-buttons
       (filterChanged)="onQuantityChanged($event)"
     ></app-quantity-buttons>
