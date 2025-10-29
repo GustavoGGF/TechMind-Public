@@ -1,0 +1,16 @@
+{
+  "windows10_techmind": {
+    "latest_version": "3.1.0",
+    "download_url": "https://techmind.lupatech.com.br/download-files/",
+    "release_date": "01/10/2025",
+    "changelog": "Techmind as Service",
+    "mandatory": true
+  },
+  "windows10_updater": {
+    "latest_version": "1.0.0",
+    "download_url": "https://techmind.lupatech.com.br/download-files/",
+    "release_date": "09/06/2025",
+    "changelog": "Implementado tm-updater que atualizado o TechMind automaticamente",
+    "mandatory": false
+  }
+}
