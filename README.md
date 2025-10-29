@@ -34,7 +34,7 @@ A solução é composta por três camadas integradas:
 4. **Instalador (C#)**  
    Desenvolvido para garantir **implantação simples e segura** nas máquinas clientes.
 
-5. **Banco de Dados (Mysql/Redis)**
+5. **Banco de Dados (Mysql/Redis)**   
    Visando desempenho e dinamismo
 
 ---
