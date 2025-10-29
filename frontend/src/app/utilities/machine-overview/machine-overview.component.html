@@ -1,0 +1,34 @@
+<div class="maindash">
+  <div class="containers">
+    <app-loading *ngIf="notDataTotal" />
+    <span class="clr-black user-select-none" *ngIf="!notDataTotal">{{
+      totalMachines
+    }}</span>
+    <span class="clr-black user-select-none" *ngIf="!notDataTotal"
+      >Máquinas</span
+    >
+  </div>
+  <div class="containers">
+    <app-loading *ngIf="notDataWindows" /><span
+      class="clr-black user-select-none"
+      *ngIf="!notDataWindows"
+      >{{ totalWindows }}</span
+    ><span class="clr-black user-select-none" *ngIf="!notDataWindows"
+      >Windows</span
+    >
+  </div>
+  <div class="containers">
+    <app-loading *ngIf="notDataUnix" /><span
+      class="clr-black user-select-none"
+      *ngIf="!notDataUnix"
+      >{{ totalUnix }}</span
+    ><span class="clr-black user-select-none" *ngIf="!notDataUnix">Unix</span>
+  </div>
+  <div class="containers">
+    <app-loading *ngIf="notDataAd" /><span
+      class="clr-black user-select-none"
+      *ngIf="!notDataAd"
+      >{{ active_directory }}</span
+    ><span class="clr-black user-select-none" *ngIf="!notDataAd">AD</span>
+  </div>
+</div>

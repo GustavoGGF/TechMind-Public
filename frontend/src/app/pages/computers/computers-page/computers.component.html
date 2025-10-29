@@ -1,0 +1,204 @@
+<div class="main">
+  <div class="loadingTotality" *ngIf="canViewCredentialsLoading">
+    <app-loading-perfect-ape />
+  </div>
+  <app-navbar
+    *ngIf="canView"
+    [name]="name"
+    [computers_class]="computers_class"
+  />
+  <app-message
+    [errorType]="errorType"
+    [messageError]="messageError"
+    *ngIf="canViewMessage"
+    (click)="closeMessage()"
+  />
+  <app-loading *ngIf="!canView" />
+  <div class="w-100 d-flex justify-content-around">
+    <app-quantity-buttons
+      (filterChanged)="onQuantityChanged($event)"
+    ></app-quantity-buttons>
+    <app-filter-buton></app-filter-buton>
+    <div class="filter_back">
+      <div>
+        <select
+          class="form-select"
+          name="dis"
+          [(ngModel)]="selectedReports"
+          (ngModelChange)="onReportChange($event)"
+          id="selectElement"
+        >
+          <option value="None" disabled>Relatórios</option>
+          <option value="DNS">Relatório DNS</option>
+          <option value="reportxls" id="reportMachine">
+            Relatório Máquina
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <app-filter-window></app-filter-window>
+  <table class="tb">
+    <thead class="th-bl">
+      <tr>
+        <th class="thcls">
+          <div class="form-check d-flex justify-content-center">
+            <input
+              class="ckipf form-check-input"
+              type="checkbox"
+              value=""
+              (change)="selectAll()"
+            />
+          </div>
+        </th>
+        <th class="thcls text-uppercase">mac address</th>
+        <th class="thcls text-uppercase">
+          <div class="w-100 d-flex justify-content-center">
+            <label for="text-uppercase">Name</label>
+            <div class="mleft">
+              <img
+                class="img_arrows"
+                [src]="arrow_up"
+                soft_list
+                alt="seta para cima"
+                (click)="sortByName()"
+              />
+              <img
+                class="img_arrows"
+                [src]="arrow_down"
+                alt="seta para baixo"
+                (click)="sortDataByNameDescending()"
+              />
+            </div>
+          </div>
+        </th>
+        <th class="thcls text-uppercase">
+          <div class="w-100 d-flex justify-content-center">
+            <label for="text-uppercase">SO</label>
+            <div class="mleft">
+              <img
+                class="img_arrows"
+                [src]="arrow_up"
+                alt="seta para cima"
+                (click)="sortByNameSO()"
+              />
+              <img
+                class="img_arrows"
+                [src]="arrow_down"
+                alt="seta para baixo"
+                (click)="sortDataByNameDescendingSO()"
+              />
+            </div>
+          </div>
+        </th>
+        <th class="thcls text-uppercase">
+          <div class="w-100 d-flex justify-content-center">
+            <label for="text-uppercase">distribution</label>
+            <div class="mleft">
+              <img
+                class="img_arrows"
+                [src]="arrow_up"
+                alt="seta para cima"
+                (click)="sortByNameDis()"
+              />
+              <img
+                class="img_arrows"
+                [src]="arrow_down"
+                alt="seta para baixo"
+                (click)="sortDataByNameDescendingDis()"
+              />
+            </div>
+          </div>
+        </th>
+        <th class="thcls text-uppercase">
+          <div class="w-100 d-flex justify-content-center">
+            <div>last update</div>
+            <div class="mleft">
+              <img
+                class="img_arrows"
+                [src]="arrow_up"
+                alt="seta para cima"
+                (click)="sortByDateDesc()"
+              />
+              <img
+                class="img_arrows"
+                [src]="arrow_down"
+                alt="seta para baixo"
+                (click)="sortByDateASC()"
+              />
+            </div>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody *ngIf="canViewMachines">
+      <tr
+        class="trcls"
+        *ngFor="let machine of dataMachines; let i = index"
+        [ngClass]="i % 2 === 0 ? 'bg-wh' : 'bg-gr'"
+      >
+        <td class="tdsadj">
+          <div class="form-check d-flex justify-content-center">
+            <input
+              class="ckip form-check-input"
+              type="checkbox"
+              [value]="machine.mac_address"
+            />
+          </div>
+        </td>
+        <td class="tdsadj" (mousedown)="onRowClick(i, $event)">
+          {{ machine.mac_address }}
+        </td>
+        <td class="tdsadj" (mousedown)="onRowClick(i, $event)">
+          {{ machine.name }}
+        </td>
+        <td class="tdsadj" (mousedown)="onRowClick(i, $event)">
+          {{ machine.system_name }}
+        </td>
+        <td class="tdsadj" (mousedown)="onRowClick(i, $event)">
+          {{ machine.distribution }}
+        </td>
+        <td class="tdsadj" (mousedown)="onRowClick(i, $event)">
+          {{ formatDate(machine.insertion_date) }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    *ngIf="canViewCredentials"
+    class="dashReport position-fixed top-50 start-50 translate-middle"
+  >
+    <button
+      id="closeReport"
+      (click)="closeCredential()"
+      class="position-absolute top-0 end-0 btn"
+    >
+      <img [src]="closeBTN" class="img-fluid img_close" alt="Botão de Fechar" />
+    </button>
+    <div class="form-floating mb-3">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Username"
+        (input)="getUserName($event)"
+        [(ngModel)]="inputUsername"
+      />
+      <label for="floatingModel">Username</label>
+    </div>
+    <div class="form-floating mb-3">
+      <input
+        type="password"
+        class="form-control"
+        placeholder="Password"
+        (input)="getPwd($event)"
+        [(ngModel)]="inputPass"
+      />
+      <label for="floatingModel">Password</label>
+    </div>
+    <div>
+      <button class="btn btn-success" (click)="submitReportDNS()">
+        Gerar Relatório
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div id="chart" class="position-relative">
+  <apx-chart
+    class="d-block chart"
+    *ngIf="canViewChart"
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [title]="chartOptions.title"
+    [plotOptions]="chartOptions.plotOptions"
+    [legend]="chartOptions.legend"
+    [dataLabels]="chartOptions.dataLabels"
+  ></apx-chart>
+  <app-loading-search
+    class="position-absolute top-50 start-50 translate-middle"
+    *ngIf="!canViewChart"
+  />
+</div>

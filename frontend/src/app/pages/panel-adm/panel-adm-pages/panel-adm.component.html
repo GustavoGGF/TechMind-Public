@@ -1,0 +1,237 @@
+<div class="main">
+  <app-navbar [name]="name" [panel_class]="panel_class" />
+  <app-message
+    [errorType]="errorType"
+    [messageError]="messageError"
+    (click)="hideMessage()"
+    *ngIf="showMessage"
+  />
+  <div class="mg-2 bg-white pd-1 brd-rg-1 border-bottom mb-5">
+    <div class="w-100 d-flex justify-content-end">
+      <div *ngFor="let i of createRange(tabsMachines)">
+        <span class="custom-spam" (click)="nextPageMachines(i)"
+          >[{{ i + 1 }}]</span
+        >
+      </div>
+    </div>
+    <table class="table-panel">
+      <thead class="border-bottom">
+        <tr class="u-none">
+          <th>
+            <div class="d-flex">
+              <span>Status</span>
+              <div>
+                <img
+                  class="img_arrows"
+                  [src]="arrow_up"
+                  alt="seta para cima"
+                  (click)="ordemList('increasing', 'insertion_date')"
+                />
+                <img
+                  class="img_arrows"
+                  [src]="arrow_down"
+                  alt="seta para baixo"
+                  (click)="ordemList('decreasing', 'insertion_date')"
+                />
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="d-flex">
+              <span>Nome</span>
+              <div>
+                <img
+                  class="img_arrows"
+                  [src]="arrow_up"
+                  alt="seta para cima"
+                  (click)="ordemList('increasing', 'name')"
+                />
+                <img
+                  class="img_arrows"
+                  [src]="arrow_down"
+                  alt="seta para baixo"
+                  (click)="ordemList('decreasing', 'name')"
+                />
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="d-flex">
+              <span>IP</span>
+              <div>
+                <img
+                  class="img_arrows"
+                  [src]="arrow_up"
+                  alt="seta para cima"
+                  (click)="ordemList('increasing', 'ip')"
+                />
+                <img
+                  class="img_arrows"
+                  [src]="arrow_down"
+                  alt="seta para baixo"
+                  (click)="ordemList('decreasing', 'ip')"
+                />
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="d-flex">
+              <span>Usuário atual</span>
+              <div>
+                <img
+                  class="img_arrows"
+                  [src]="arrow_up"
+                  alt="seta para cima"
+                  (click)="ordemList('increasing', 'logged_user')"
+                />
+                <img
+                  class="img_arrows"
+                  [src]="arrow_down"
+                  alt="seta para baixo"
+                  (click)="ordemList('decreasing', 'logged_user')"
+                />
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="d-flex">
+              <span>Último Contato</span>
+              <div>
+                <img
+                  class="img_arrows"
+                  [src]="arrow_up"
+                  alt="seta para cima"
+                  (click)="ordemList('increasing', 'insertion_date')"
+                />
+                <img
+                  class="img_arrows"
+                  [src]="arrow_down"
+                  alt="seta para baixo"
+                  (click)="ordemList('decreasing', 'insertion_date')"
+                />
+              </div>
+            </div>
+          </th>
+          <th>
+            <div class="d-flex">
+              <span>Versão</span>
+              <div>
+                <img
+                  class="img_arrows"
+                  [src]="arrow_up"
+                  alt="seta para cima"
+                  (click)="ordemList('increasing', 'version')"
+                />
+                <img
+                  class="img_arrows"
+                  [src]="arrow_down"
+                  alt="seta para baixo"
+                  (click)="ordemList('decreasing', 'version')"
+                />
+              </div>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container class="w-100 position-relative">
+          <app-loading-search
+            class="loading-position"
+            *ngIf="canViewLoadingSearch"
+          />
+        </ng-container>
+        <ng-container *ngIf="!canViewLoadingSearch">
+          <ng-container *ngFor="let machine of listMachines; let i = index">
+            <tr
+              class="tr-adjust"
+              [id]="'status_dot_tr_' + i"
+              (contextmenu)="onRightClick($event)"
+            >
+              <td>
+                <div class="status-container dot_validate">
+                  <div
+                    class="dot_validate"
+                    #btnRef
+                    [id]="'status_dot_div_' + i"
+                    (click)="activePopOver('status_dot_div_' + i)"
+                    data-bs-toggle="popover"
+                  ></div>
+                  <div
+                    [id]="'status_dot_div_ping' + i"
+                    class="dot_validate"
+                  ></div>
+                </div>
+              </td>
+              <td>
+                {{ machine.name }}
+              </td>
+              <td>
+                {{ machine.ip }}
+              </td>
+              <td>
+                {{ machine.logged_user }}
+              </td>
+              <td>
+                {{
+                  adjustDate(
+                    machine.insertion_date,
+                    "status_dot_div_" + i,
+                    "status_dot_div_ping" + i
+                  )
+                }}
+              </td>
+              <td>{{ machine.version }}</td>
+            </tr>
+            <tr style="height: 1em"></tr>
+          </ng-container>
+          <ul
+            class="custom-menu"
+            *ngIf="menuVisible"
+            [style.left.px]="menuPosition.x"
+            [style.top.px]="menuPosition.y"
+          >
+            <li (click)="forceUpdate()" class="custom-li">Atualizar</li>
+          </ul>
+        </ng-container>
+      </tbody>
+    </table>
+    <div class="w-100 d-flex justify-content-end">
+      <div *ngFor="let i of createRange(tabsMachines)">
+        <span class="custom-spam" (click)="nextPageMachines(i)"
+          >[{{ i + 1 }}]</span
+        >
+      </div>
+    </div>
+  </div>
+  <div
+    [ngClass]="'process-tab ' + processAnimation"
+    id="process-tb"
+    *ngIf="canViewProcessTab"
+  >
+    <div *ngIf="failServerComunication">DETALHESSSSSS</div>
+    <div class="position-relative">
+      <img
+        class="img-fluid position-absolute img-adjust"
+        [src]="buttomSize"
+        alt="botão para minimizar"
+        (click)="resizeProcessTab()"
+      />
+    </div>
+    <table class="table-panel">
+      <thead>
+        <tr>
+          <th>{{ processHeader }}</th>
+          <th>{{ statusHeader }}</th>
+          <th>{{ machineHeader }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ processExec }}</td>
+          <td>{{ statusPorcentage }}</td>
+          <td>{{ machineName }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<div
+  class="white-board position-fixed top-50 start-50 translate-middle"
+  [hidden]="!filter_active"
+>
+  <div class="o-x" id="this_filter">
+    <div class="w-100 position-relative">
+      <h4 class="text-center u-none">Criação de Filtro</h4>
+      <div class="position-absolute top-0 end-0">
+        <img
+          class="img-fluid pointer"
+          [src]="closeBTN"
+          alt="fechar"
+          (click)="closeFilter()"
+        />
+      </div>
+    </div>
+    <div class="d-flex mt-3 flex-column" id="set_filter">
+      <div class="d-flex justify-content-evenly">
+        <select
+          id="select-cat"
+          class="form-select wd_form"
+          [(ngModel)]="selectedValueCategory"
+          (change)="change_filter_list()"
+        >
+          <option selected disabled value="first">Selecione...</option>
+          <option *ngFor="let options of filter_list" [value]="options">
+            {{ options }}
+          </option>
+        </select>
+        <select
+          id="select-type"
+          class="form-select wd_form"
+          *ngIf="filter_select_option"
+          [(ngModel)]="options_filter_list_selected"
+          (ngModelChange)="
+            change_filter_select_option(
+              this.options_filter_list_selected,
+              false
+            )
+          "
+        >
+          <option selected disabled value="first">Selecione...</option>
+          <option
+            *ngFor="let options_list of options_filter_list"
+            [value]="options_list"
+          >
+            {{ options_list }}
+          </option>
+        </select>
+        <div *ngIf="filter_option_content">
+          <input
+            class="form-control wd_form"
+            type="text"
+            [(ngModel)]="field_text"
+            (keyup)="inputedValueField($event)"
+          />
+        </div>
+        <div *ngIf="filter_option_content_load">
+          <select
+            class="form-select wd_form"
+            (change)="selectedValueField($event)"
+            id="software_list"
+          >
+            <option selected disabled>Selecione...</option>
+            <option
+              *ngFor="let options_field of options_filter_field"
+              [value]="options_field"
+            >
+              {{ options_field }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-evenly mt-5">
+      <div *ngIf="new_filter">
+        <button class="btn btn_add wd_form" (click)="addNewFilter()">
+          Adicionar Filtro
+        </button>
+      </div>
+      <div>
+        <button class="btn btn_app wd_form" (click)="apply_filter()">
+          Aplicar Filtro
+        </button>
+      </div>
+      <div *ngIf="showDeleteFilter">
+        <button class="btn bnt_rmv wd_form" (click)="callDeleteFilter()">
+          Remover Filtro
+        </button>
+      </div>
+    </div>
+    <div *ngIf="filter_loading" class="position-relative w-100 h-100">
+      <app-loading-search
+        class="position-absolute top-50 start-50 translate-middle"
+      />
+    </div>
+  </div>
+</div>

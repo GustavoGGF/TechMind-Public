@@ -1,0 +1,8 @@
+<div class="d-flex">
+  <button class="btn" (click)="createFilter()">
+    <img [src]="create_filter" alt="filter" />
+  </button>
+  <button class="btn" (click)="callDeleteFilter()" *ngIf="delete_filter_active">
+    <img [src]="delete_filter" alt="deletar filtro" />
+  </button>
+</div>

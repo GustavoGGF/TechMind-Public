@@ -1,0 +1,29 @@
+.margin_quantity {
+  margin: 0.3em;
+}
+
+.buton_quantity {
+  background-color: #dee3e7;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  padding: 0.3em;
+  border-radius: 0.3em;
+  color: var(--white);
+  min-width: 2em;
+  display: block;
+  text-align: center;
+  align-content: center;
+}
+
+.buton_quantity:hover {
+  color: var(--black);
+  background-color: #c8cdd2;
+}
+
+.active_filter {
+  background-color: #0d6efd;
+  color: var(--black);
+}

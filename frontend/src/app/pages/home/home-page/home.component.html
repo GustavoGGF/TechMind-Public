@@ -1,0 +1,23 @@
+<div>
+  <section>
+    <app-navbar *ngIf="canView" [name]="name" [home_class]="home_class" />
+  </section>
+  <app-loading *ngIf="!canView" />
+  <app-message
+    [errorType]="errorType"
+    [messageError]="messageError"
+    (click)="hideMessage()"
+    *ngIf="showMessage"
+  />
+  <div *ngIf="canView">
+    <section>
+      <app-machine-overview />
+    </section>
+    <section>
+      <app-chart-treemap />
+    </section>
+    <section>
+      <app-chart-basic-area />
+    </section>
+  </div>
+</div>

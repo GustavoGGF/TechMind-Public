@@ -1,0 +1,18 @@
+.bg-msg {
+  background: #fef2f2;
+  border: 0.2em #f87171 solid;
+  border-radius: 0.7em;
+}
+
+.bd-b {
+  border-bottom: 0.1em black solid;
+}
+
+.st-tlt {
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+.st-msg {
+  color: #991b1b;
+}

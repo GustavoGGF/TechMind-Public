@@ -1,0 +1,42 @@
+.white-board {
+  width: 70%;
+  height: 85%;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 1em;
+  z-index: 10;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  border: 0.3em solid #dee3e7;
+}
+
+.o-x {
+  overflow-x: hidden;
+}
+
+.btn_app {
+  transition: 0.3s ease-in-out;
+  background-color: #0d6efd;
+}
+.btn_app:hover {
+  background-color: #0056b3;
+}
+
+.bnt_rmv {
+  transition: 0.3s ease-in-out;
+  background-color: #dc3545;
+}
+
+.btn_add {
+  transition: 0.3s ease-in-out;
+  background-color: #dee3e7;
+}
+
+.btn_add:hover {
+  background-color: #c8cdd2;
+}
+
+.pointer {
+  cursor: pointer;
+}

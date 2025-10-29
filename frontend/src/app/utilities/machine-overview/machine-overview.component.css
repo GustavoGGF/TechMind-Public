@@ -1,0 +1,27 @@
+.maindash {
+  background-color: #e5e7eb;
+  margin: 1em;
+  display: flex;
+  justify-content: space-between;
+  color: var(--white);
+  border-radius: 1em;
+  margin-top: 3em;
+}
+
+.containers {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: bold;
+  margin: 1em;
+  background-color: #10b981;
+  width: 10em;
+  height: 4em;
+}
+
+.clr-black {
+  color: #111827;
+}

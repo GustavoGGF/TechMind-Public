@@ -1,0 +1,18 @@
+<div id="chart">
+  <apx-chart
+    *ngIf="canViewChart"
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [xaxis]="chartOptions.xaxis"
+    [yaxis]="chartOptions.yaxis"
+    [dataLabels]="chartOptions.dataLabels"
+    [stroke]="chartOptions.stroke"
+    [title]="chartOptions.title"
+    [labels]="chartOptions.labels"
+    [subtitle]="chartOptions.subtitle"
+  ></apx-chart>
+  <app-loading-search
+    class="position-absolute top-50 start-50 translate-middle"
+    *ngIf="!canViewChart"
+  />
+</div>
